@@ -42,7 +42,7 @@ change for every language.**
 
 ```bash
 pnpm install
-SHUKKA_SPEC_DIR=../shukka/apps/docs/public node scripts/fetch-spec.mjs   # or omit to pull from the docs site
+SHUKKA_SPEC_DIR=../shukka/apps/docs/public node scripts/fetch-spec.mjs   # or omit to pull from shukka main
 node scripts/generate.mjs              # all four
 node scripts/generate.mjs dart swift   # just these
 ```

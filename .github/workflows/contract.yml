@@ -1,5 +1,9 @@
 # Runs every generated SDK against a real Shukka instance.
 #
+# The runtime image is built from the shukka repository, not pulled from GHCR:
+# the package is not public, and building from the same ref the contract came
+# from is the point of the test. Pass `shukka_image` to reuse a prebuilt image.
+#
 # The stack is thrown away afterwards: docker-compose.contract.yml starts
 # Shukka + MinIO, provision.mjs creates an app and a key, publish.mjs uploads
 # one Tauri release, and each language runner reads it back through its own
@@ -9,10 +13,14 @@ name: contract
 on:
   workflow_dispatch:
     inputs:
-      shukka_image:
-        description: Runtime image to test against
+      shukka_ref:
+        description: shukka ref to build the runtime image from
         required: false
-        default: ghcr.io/shukka-app/shukka:latest
+        default: main
+      shukka_image:
+        description: Prebuilt image to use instead of building
+        required: false
+        default: ''
   push:
     branches: [main]
     paths:
@@ -45,10 +53,27 @@ jobs:
     name: Generated clients vs a live Shukka
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    env:
-      SHUKKA_IMAGE: ${{ github.event.inputs.shukka_image || 'ghcr.io/shukka-app/shukka:latest' }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the SDK
+        uses: actions/checkout@v4
+
+      - name: Check out shukka
+        if: inputs.shukka_image == ''
+        uses: actions/checkout@v4
+        with:
+          repository: shukka-app/shukka
+          ref: ${{ inputs.shukka_ref || 'main' }}
+          path: .shukka
+
+      - name: Build the runtime image
+        if: inputs.shukka_image == ''
+        run: docker build -t shukka-contract:ci -f .shukka/apps/shukka/Dockerfile .shukka
+
+      - name: Choose the runtime image
+        run: |
+          IMAGE="${{ inputs.shukka_image }}"
+          if [ -z "$IMAGE" ]; then IMAGE="shukka-contract:ci"; fi
+          echo "SHUKKA_IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
       - uses: pnpm/action-setup@v4
 
@@ -59,7 +84,7 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: '3.10.9'
 
       - uses: dtolnay/rust-toolchain@stable
 

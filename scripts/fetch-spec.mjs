@@ -6,9 +6,13 @@
  *   SHUKKA_SPEC_URL=https://updates.example.com node scripts/fetch-spec.mjs
  *   SHUKKA_SPEC_DIR=../shukka/apps/docs/public node scripts/fetch-spec.mjs
  *
- * The default source is the public docs site, which publishes a build of
- * shukka's own spec builder. In CI this will instead read the release asset
- * (`openapi.json` + `openapi.v3.0.json`), which is immutable per tag.
+ * The default source is shukka's committed docs snapshot on `main`. Once
+ * releases publish `openapi.json` + `openapi.v3.0.json` as assets, CI will read
+ * those instead — they are immutable per tag.
+ *
+ * The lock file records only the contract's identity (version, sha256,
+ * operation count); where it was read from stays out, so fetching from a
+ * directory and fetching from a URL produce the same lock.
  *
  * spec/openapi.json     — OpenAPI 3.1.0 (en), what @hey-api and Swift consume
  * spec/openapi-3.0.json — OpenAPI 3.0.3 (en), what openapi-generator and
@@ -22,7 +26,9 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const specDir = join(root, 'spec')
 
-const baseUrl = (process.env.SHUKKA_SPEC_URL ?? 'https://shukka.akr.moe').replace(/\/+$/, '')
+const baseUrl = (
+  process.env.SHUKKA_SPEC_URL ?? 'https://raw.githubusercontent.com/shukka-app/shukka/main/apps/docs/public'
+).replace(/\/+$/, '')
 const localDir = process.env.SHUKKA_SPEC_DIR
 
 const snapshots = [
@@ -47,7 +53,12 @@ function operationsOf(pathItem) {
     .map(([, operation]) => operation)
 }
 
-const lock = { source: localDir ? `dir:${resolve(localDir)}` : `url:${baseUrl}`, fetchedAt: new Date().toISOString(), files: {} }
+/**
+ * The lock stays deterministic: it records the contract's identity (version,
+ * sha256, operation count), not where this run happened to read it. A
+ * timestamp or source URL here would make every regeneration look like drift.
+ */
+const lock = { files: {} }
 
 for (const snapshot of snapshots) {
   const text = await readSource(snapshot)
@@ -75,4 +86,4 @@ for (const snapshot of snapshots) {
 }
 
 await writeFile(join(specDir, 'openapi.lock.json'), `${JSON.stringify(lock, null, 2)}\n`)
-console.log(`Wrote spec/openapi.lock.json (source: ${lock.source})`)
+console.log(`Wrote spec/openapi.lock.json (read from ${localDir ? `dir:${resolve(localDir)}` : `url:${baseUrl}`})`)

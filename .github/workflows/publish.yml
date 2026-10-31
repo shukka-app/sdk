@@ -47,7 +47,7 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: '3.10.9'
 
       - uses: dtolnay/rust-toolchain@stable
 

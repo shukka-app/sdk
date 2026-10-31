@@ -14,7 +14,7 @@ on:
       spec_base_url:
         description: Base URL holding openapi.json and openapi.v3.0.json
         required: false
-        default: https://shukka.akr.moe
+        default: https://raw.githubusercontent.com/shukka-app/shukka/main/apps/docs/public
       create_pr:
         description: Open a pull request when generation changes files
         type: boolean
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      SHUKKA_SPEC_URL: ${{ github.event.client_payload.spec_base_url || github.event.inputs.spec_base_url || 'https://shukka.akr.moe' }}
+      SHUKKA_SPEC_URL: ${{ github.event.client_payload.spec_base_url || github.event.inputs.spec_base_url || 'https://raw.githubusercontent.com/shukka-app/shukka/main/apps/docs/public' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,7 +52,7 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: '3.10.9'
 
       - uses: dtolnay/rust-toolchain@stable
 
