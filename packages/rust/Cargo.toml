@@ -1,0 +1,25 @@
+[package]
+name = "shukka"
+version = "0.1.0"
+edition = "2021"
+description = "Rust client for the Shukka release API, generated from the OpenAPI contract"
+license = "MIT"
+repository = "https://github.com/shukka-app/sdk"
+readme = "README.md"
+keywords = ["shukka", "openapi", "updates", "release"]
+categories = ["api-bindings"]
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+futures = "0.3"
+percent-encoding = "2"
+progenitor-client = "0.15"
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[build-dependencies]
+prettyplease = "0.2"
+progenitor = "0.15"
+serde_json = "1"
+syn = "2"

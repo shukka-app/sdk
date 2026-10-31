@@ -1,0 +1,56 @@
+# Skeleton: regenerate every SDK from a shukka release.
+#
+# Not wired up yet — the repository, the release assets, and the publish
+# credentials do not exist. This file records the intended shape.
+name: generate
+
+on:
+  repository_dispatch:
+    types: [shukka-release]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: dart-lang/setup-dart@v1
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swift-actions/setup-swift@v2
+
+      - run: pnpm install --frozen-lockfile
+
+      # TODO: point at the release assets once shukka publishes them, e.g.
+      #   ${{ github.event.client_payload.spec_base_url }}
+      - name: Fetch contract
+        run: node scripts/fetch-spec.mjs
+        env:
+          SHUKKA_SPEC_URL: https://shukka.akr.moe
+
+      - name: Generate every language
+        run: node scripts/generate.mjs
+
+      # TODO: opening a PR (peter-evans/create-pull-request) once the repo exists.
+      #   No diff means the release did not change the contract — exit 0 either way.
+      - name: Show drift
+        run: git status --short
+
+      # TODO: publish jobs, fanned out after the PR merges and a tag is cut:
+      #   npm publish --workspace packages/typescript --provenance
+      #   dart pub publish --force          (packages/dart)
+      #   cargo publish                      (packages/rust)
+      #   git tag vX.Y.Z                     (the Swift package resolves from the tag)

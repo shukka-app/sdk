@@ -1,0 +1,11 @@
+# dart-dio generator settings (`openapi-generator-cli generate -c`).
+pubName: shukka_sdk
+pubVersion: 0.1.0
+pubDescription: Dart client for the Shukka release API, generated from the OpenAPI contract
+pubAuthor: shukka-app
+pubHomepage: https://github.com/shukka-app/sdk
+pubRepository: https://github.com/shukka-app/sdk
+pubLibrary: shukka_sdk.api
+serializationLibrary: json_serializable
+dateLibrary: core
+enumUnknownDefaultCase: true

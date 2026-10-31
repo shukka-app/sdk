@@ -1,0 +1,16 @@
+{
+  "source": "dir:/Users/akrc/Developer/shukka-monorepo/shukka/apps/docs/public",
+  "fetchedAt": "2026-10-30T13:51:58.997Z",
+  "files": {
+    "openapi.json": {
+      "openapi": "3.1.0",
+      "sha256": "632b0c7deed24c4b5ef54ff1e5929163b3b2caae4abb3e085b1051e52841ce48",
+      "operations": 21
+    },
+    "openapi-3.0.json": {
+      "openapi": "3.0.3",
+      "sha256": "97fea4ab013f256ef7a160fade774adef74e9381ddbdb5061a40c9de789692ba",
+      "operations": 21
+    }
+  }
+}

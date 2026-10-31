@@ -1,0 +1,39 @@
+{
+  "name": "@shukka/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript client for the Shukka release API, generated from the OpenAPI contract",
+  "license": "MIT",
+  "homepage": "https://github.com/shukka-app/sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shukka-app/sdk.git",
+    "directory": "packages/typescript"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "generate": "openapi-ts -f openapi-ts.config.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --sourcemap"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}

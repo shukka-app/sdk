@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.openapi-generator/
+
+# Dart
+packages/dart/.dart_tool/
+packages/dart/.packages
+
+# Rust
+packages/rust/target/
+
+# Swift
+packages/swift/.build/
+packages/swift/.swiftpm/
