@@ -10,9 +10,11 @@ one OpenAPI contract.
 | `packages/rust` | Rust | [progenitor](https://github.com/oxidecomputer/progenitor) | crates.io `shukka` |
 | `packages/swift` | Swift | [swift-openapi-generator](https://github.com/apple/swift-openapi-generator) | Swift Package Manager |
 
-Nothing here is hand-written except the thin facades
-(`packages/typescript/src/index.ts`, `packages/rust/src/lib.rs`,
-`packages/swift/Sources/ShukkaSDK/ShukkaSDK.swift`) and this repository's scripts.
+Nothing here is hand-written except the Rust and Swift facades
+(`packages/rust/src/lib.rs`, `packages/swift/Sources/ShukkaSDK/ShukkaSDK.swift`)
+and this repository's scripts. The TypeScript facade is generated too:
+`generate.mjs` writes `packages/typescript/src/index.ts` from the contract's
+operationIds, so a new operation cannot be left unbound.
 
 ## The contract
 
