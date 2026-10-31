@@ -103,10 +103,13 @@ only after the package's first, hand-published version.
 
 ## Release flow
 
-1. shukka tags a release and publishes `openapi.json` + `openapi.v3.0.json` as release
-   assets. (Not wired up yet — until then the spec is pulled from the docs site.)
-2. `repository_dispatch` (`shukka-release`) lands here; `fetch-spec.mjs` pulls from the
-   payload's `spec_base_url`.
+1. shukka publishes a GitHub release; its `sdk-dispatch.yml` sends
+   `repository_dispatch` (`shukka-release`) here. The payload's `spec_base_url` points at
+   that tag's `apps/docs/public` snapshots (`raw.githubusercontent.com/…/<tag>/…`), so the
+   SDK is generated from the release the tag names, not from a moving `main`.
+   (Publishing the snapshots as release assets is still a TODO; raw tag URLs pin the same
+   files today.)
+2. `fetch-spec.mjs` pulls both snapshots from the payload's `spec_base_url`.
 3. `generate.yml` runs `generate.mjs`; no diff means the release did not change the contract.
 4. On drift, `generate.yml` opens a pull request with the regenerated code. Review
    `spec/openapi.lock.json` first, then the generated packages; merging tags `vX.Y.Z`.
