@@ -44,26 +44,19 @@ Verified on 2026-10-31: `0.1.0` was the one-off hand publish, and `0.1.1` was pu
 - [x] `npm trust github @shukka/sdk --repo shukka-app/sdk --file publish.yml --allow-publish`.
 - [x] Dispatch `publish.yml` with `dry_run: false, version: 0.1.1`; provenance is attached.
 
-## 4. pub.dev and crates.io — bootstrap pending
+## 4. pub.dev and crates.io — done
 
-Both registries now support OIDC, and both follow the npm shape: one hand publish, then
-register this repository and `publish.yml`. Until then, `publish.yml` only dry-runs them.
+Verified on 2026-10-31 with tag `v0.1.2`: `publish.yml` published all three packages through
+OIDC with no secrets — `@shukka/sdk@0.1.2` (npm, with provenance), `shukka_sdk@0.1.2`
+(pub.dev) and `shukka@0.1.2` (crates.io). The hand-published `0.1.0` on each registry was
+the bootstrap; registries only accept a trusted publisher for an existing package.
 
-pub.dev:
-
-- [ ] `dart pub login`, then `dart pub publish` from `packages/dart` (first version, 0.1.0).
-- [ ] Admin → Automated publishing: repository `shukka-app/sdk`, tag pattern `v{{version}}`,
-      workflow `publish.yml`.
-- [ ] Add a `pubdev` job that sets the version from the tag and runs
-      `dart pub publish --force` (the OIDC token is minted by `setup-dart`).
-
-crates.io:
-
-- [ ] `cargo login`, then `cargo publish` from `packages/rust` (first version, 0.1.0).
-- [ ] Crate settings → Trusted Publishing: repository `shukka-app/sdk`, workflow
-      `publish.yml`.
-- [ ] Add a `crates` job using `rust-lang/crates-io-auth-action@v1` and
-      `cargo publish --token "$TOKEN"`.
+- [x] `dart pub login` + `dart pub publish` (0.1.0) from `packages/dart`.
+- [x] pub.dev → Automated publishing: repository `shukka-app/sdk`, tag pattern
+      `v{{version}}`, workflow `publish.yml`, no required environment.
+- [x] `cargo login` + `cargo publish` (0.1.0) from `packages/rust`.
+- [x] crates.io → Trusted Publishing: repository `shukka-app/sdk`, workflow `publish.yml`,
+      no environment.
 
 ## Later
 

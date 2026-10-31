@@ -110,8 +110,8 @@ only after the package's first, hand-published version.
 3. `generate.yml` runs `generate.mjs`; no diff means the release did not change the contract.
 4. On drift, `generate.yml` opens a pull request with the regenerated code. Review
    `spec/openapi.lock.json` first, then the generated packages; merging tags `vX.Y.Z`.
-5. `publish.yml` publishes npm from that tag. pub.dev and crates.io follow once their OIDC
-   publishing is configured.
+5. `publish.yml` publishes every package from that tag — npm, pub.dev and crates.io, all
+   through OIDC — and npm attaches a provenance attestation.
 
 The SDK version tracks the shukka release it was generated from. Breaking contract changes
 (renamed `operationId`, removed fields) bump the SDK major.
