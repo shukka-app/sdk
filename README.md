@@ -96,11 +96,10 @@ release the contract came from; `--no-docker` reuses an instance at
 tarball, runs `dart pub publish --dry-run`, `cargo publish --dry-run`, and
 `swift package describe`.
 
-On a `vX.Y.Z` tag, `.github/workflows/publish.yml` publishes `@shukka/sdk` through npm
-trusted publishing — GitHub OIDC with no token in secrets. The trusted publisher is
-registered with `npm trust github @shukka/sdk --repo shukka-app/sdk --file publish.yml
---allow-publish` after the package's first, hand-published version. pub.dev and crates.io
-support trusted publishing too; see [`TODO.md`](TODO.md).
+On a `vX.Y.Z` tag, `.github/workflows/publish.yml` publishes all three packages through
+trusted publishing — GitHub OIDC with no tokens in secrets: `@shukka/sdk` to npm,
+`shukka_sdk` to pub.dev, `shukka` to crates.io. Each registry accepts a trusted publisher
+only after the package's first, hand-published version.
 
 ## Release flow
 

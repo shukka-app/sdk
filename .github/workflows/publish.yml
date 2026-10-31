@@ -1,8 +1,8 @@
-# Checks what each registry would receive, and publishes the npm package from a
-# tag using npm's trusted publishing (OIDC, no long-lived token).
+# Checks what each registry would receive, then publishes every package from a
+# tag through the registry's trusted publishing (OIDC, no long-lived token).
 #
-# pub.dev and crates.io are validated here but still published by hand — see
-# TODO.md for moving them to OIDC as well.
+# npm, pub.dev and crates.io each accept a trusted publisher only after the
+# package's first, hand-published version exists — see TODO.md for the bootstrap.
 name: publish
 
 on:
@@ -106,3 +106,65 @@ jobs:
       - name: Publish with provenance
         working-directory: packages/typescript
         run: npm publish --provenance --access public
+
+  pubdev:
+    name: Publish shukka_sdk (trusted publishing)
+    needs: verify
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # setup-dart mints the OIDC token and stores it for `dart pub publish`.
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.9'
+
+      - name: Write the version from the tag
+        run: node scripts/set-version.mjs "${GITHUB_REF_NAME#v}"
+
+      - run: dart pub get
+        working-directory: packages/dart
+
+      - name: Publish
+        working-directory: packages/dart
+        run: dart pub publish --force
+
+  crates:
+    name: Publish shukka (trusted publishing)
+    needs: verify
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # Exchanges the GitHub OIDC token for a crates.io token that lasts one hour.
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+
+      - name: Write the version from the tag
+        run: node scripts/set-version.mjs "${GITHUB_REF_NAME#v}"
+
+      - name: Publish
+        working-directory: packages/rust
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: cargo publish --allow-dirty

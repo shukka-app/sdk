@@ -33,29 +33,37 @@ Remaining:
 - [x] Re-check `@shukka/sdk` and `shukka_sdk` immediately before the first publish
       (both 404 on 2026-10-31).
 
-## 3. npm trusted publishing — workflow done, registration pending
+## 3. npm trusted publishing — done
 
-`.github/workflows/publish.yml` publishes on a `vX.Y.Z` tag with
-`permissions: { contents: read, id-token: write }` and npm ≥ 11.15. No token in secrets.
+Verified on 2026-10-31: `0.1.0` was the one-off hand publish, and `0.1.1` was published by
+`publish.yml` through OIDC with no token. The registry serves two attestations for it
+(`npm publish` + SLSA provenance), and `latest` points at `0.1.1`.
 
-npm only accepts a trusted publisher for a package that already exists, so the first
-version goes up by hand once:
+- [x] `@shukka` scope exists and the account can write to it.
+- [x] First publish `0.1.0` with a token.
+- [x] `npm trust github @shukka/sdk --repo shukka-app/sdk --file publish.yml --allow-publish`.
+- [x] Dispatch `publish.yml` with `dry_run: false, version: 0.1.1`; provenance is attached.
 
-```bash
-npm login                                      # 2FA must be on for the account
-npm install -g 'npm@^11.15.0'                  # provides `npm trust`
-pnpm --filter @shukka/sdk build
-cd packages/typescript && npm publish --access public
-npm trust github @shukka/sdk \
-  --repo shukka-app/sdk --file publish.yml --allow-publish
-```
+## 4. pub.dev and crates.io — bootstrap pending
 
-- [ ] Confirm the `@shukka` scope exists on npm and the account can write to it
-      (create the org at npmjs.com/org/create if it does not).
-- [ ] First publish `0.1.0` with the token path above.
-- [ ] `npm trust github … --allow-publish` (without it, only `npm stage publish` is allowed).
-- [ ] Dispatch `publish.yml` with `dry_run: false` and a new version (e.g. `0.1.1`) to
-      prove the OIDC path; the package page should then show a provenance badge.
+Both registries now support OIDC, and both follow the npm shape: one hand publish, then
+register this repository and `publish.yml`. Until then, `publish.yml` only dry-runs them.
+
+pub.dev:
+
+- [ ] `dart pub login`, then `dart pub publish` from `packages/dart` (first version, 0.1.0).
+- [ ] Admin → Automated publishing: repository `shukka-app/sdk`, tag pattern `v{{version}}`,
+      workflow `publish.yml`.
+- [ ] Add a `pubdev` job that sets the version from the tag and runs
+      `dart pub publish --force` (the OIDC token is minted by `setup-dart`).
+
+crates.io:
+
+- [ ] `cargo login`, then `cargo publish` from `packages/rust` (first version, 0.1.0).
+- [ ] Crate settings → Trusted Publishing: repository `shukka-app/sdk`, workflow
+      `publish.yml`.
+- [ ] Add a `crates` job using `rust-lang/crates-io-auth-action@v1` and
+      `cargo publish --token "$TOKEN"`.
 
 ## Later
 
@@ -64,4 +72,3 @@ npm trust github @shukka/sdk \
 - [ ] Upload helper per language (`initUpload → presigned PUT → finalizeUpload`).
 - [ ] Release assets: shukka publishes `openapi.json` + `openapi.v3.0.json` with a release,
       and `repository_dispatch` sends `spec_base_url` here (the workflow already reads it).
-- [ ] crates.io Trusted Publishing and pub.dev OIDC, so no registry tokens exist at all.
