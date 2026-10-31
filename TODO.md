@@ -63,5 +63,6 @@ the bootstrap; registries only accept a trusted publisher for an existing packag
 - [ ] Nested model naming: top-level bodies are named components, nested objects still come
       out as `AppDetailChannelsInner`. Naming them upstream finishes the job.
 - [ ] Upload helper per language (`initUpload → presigned PUT → finalizeUpload`).
-- [ ] Release assets: shukka publishes `openapi.json` + `openapi.v3.0.json` with a release,
-      and `repository_dispatch` sends `spec_base_url` here (the workflow already reads it).
+- [ ] Release assets: shukka publishes `openapi.json` + `openapi.v3.0.json` with a release.
+      Automatic dispatch (`repository_dispatch`) is deliberately not wired — it needs a
+      cross-repo token; regeneration stays a manual `workflow_dispatch` pinned to the tag.

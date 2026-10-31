@@ -103,13 +103,13 @@ only after the package's first, hand-published version.
 
 ## Release flow
 
-1. shukka publishes a GitHub release; its `sdk-dispatch.yml` sends
-   `repository_dispatch` (`shukka-release`) here. The payload's `spec_base_url` points at
-   that tag's `apps/docs/public` snapshots (`raw.githubusercontent.com/…/<tag>/…`), so the
+1. shukka publishes a GitHub release. Regeneration is manual: dispatch `generate.yml`
+   with `spec_base_url` pinned to that tag's `apps/docs/public` snapshots
+   (`https://raw.githubusercontent.com/shukka-app/shukka/vX.Y.Z/apps/docs/public`), so the
    SDK is generated from the release the tag names, not from a moving `main`.
-   (Publishing the snapshots as release assets is still a TODO; raw tag URLs pin the same
-   files today.)
-2. `fetch-spec.mjs` pulls both snapshots from the payload's `spec_base_url`.
+   Automatic `repository_dispatch` is deliberately not wired (it would need a cross-repo
+   token); see TODO.md.
+2. `fetch-spec.mjs` pulls both snapshots from `spec_base_url`.
 3. `generate.yml` runs `generate.mjs`; no diff means the release did not change the contract.
 4. On drift, `generate.yml` opens a pull request with the regenerated code. Review
    `spec/openapi.lock.json` first, then the generated packages; merging tags `vX.Y.Z`.
