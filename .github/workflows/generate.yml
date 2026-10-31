@@ -15,14 +15,9 @@ on:
         description: Base URL holding openapi.json and openapi.v3.0.json
         required: false
         default: https://raw.githubusercontent.com/shukka-app/shukka/main/apps/docs/public
-      create_pr:
-        description: Open a pull request when generation changes files
-        type: boolean
-        default: true
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: generate
@@ -68,6 +63,12 @@ jobs:
       - name: Regenerate every language
         run: node scripts/generate.mjs
 
+      - name: Ignore the toolchain-specific Package.resolved rewrite
+        # SwiftPM recomputes `originHash` on a different toolchain even when no
+        # dependency moved. Restore the committed file so drift means generated
+        # code, not a lockfile rewrite.
+        run: git checkout -- packages/swift/Package.resolved
+
       - name: Detect drift
         id: drift
         run: |
@@ -79,24 +80,22 @@ jobs:
             git status --short
           fi
 
-      - name: Open a pull request
-        if: steps.drift.outputs.changed == 'true' && (github.event_name == 'repository_dispatch' || inputs.create_pr)
-        uses: peter-evans/create-pull-request@v7
-        with:
-          commit-message: 'chore: regenerate SDKs from the contract'
-          title: 'chore: regenerate SDKs from the contract'
-          body: |
-            Regenerated from `${{ env.SHUKKA_SPEC_URL }}`.
+      # The organization blocks GITHUB_TOKEN from creating pull requests, so
+      # this pushes a reviewable branch instead and prints the compare URL.
+      - name: Push the regenerated branch
+        if: steps.drift.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B regenerate/openapi
+          git add -A
+          git commit -m 'chore: regenerate SDKs from the contract'
+          git push --force origin regenerate/openapi
 
-            `spec/openapi.lock.json` records the sha256 of both snapshots.
-            Review the model/method diff before merging — a renamed
-            `operationId` is a breaking change in every language.
-          branch: regenerate/openapi
-          delete-branch: true
-          add-paths: |
-            spec
-            packages
-            pnpm-lock.yaml
+      - name: Point at the diff
+        if: steps.drift.outputs.changed == 'true'
+        run: |
+          echo "::notice::Compare and open a PR: ${{ github.server_url }}/${{ github.repository }}/compare/main...regenerate/openapi"
 
       - name: Upload generated output on failure
         if: failure()
