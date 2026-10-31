@@ -108,9 +108,8 @@ and crates.io are validated by the same workflow but still published by hand; se
 2. `repository_dispatch` (`shukka-release`) lands here; `fetch-spec.mjs` pulls from the
    payload's `spec_base_url`.
 3. `generate.yml` runs `generate.mjs`; no diff means the release did not change the contract.
-4. On drift, `generate.yml` pushes the `regenerate/openapi` branch and prints a compare
-   URL. The organization does not let `GITHUB_TOKEN` open pull requests, so a maintainer
-   opens it.
+4. On drift, `generate.yml` opens a pull request with the regenerated code. Review
+   `spec/openapi.lock.json` first, then the generated packages; merging tags `vX.Y.Z`.
 5. `publish.yml` publishes npm from that tag. pub.dev and crates.io follow once their OIDC
    publishing is configured.
 
