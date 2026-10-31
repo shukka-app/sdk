@@ -24,7 +24,7 @@ export type AppDetail = {
         releaseLogEnabled: boolean;
         releaseLogLocales: Array<string>;
         releaseLogFallbackLocale: string;
-        updaterKind: 'electron' | 'tauri' | 'sparkle';
+        updaterKind: 'electron' | 'tauri' | 'sparkle' | 'sdk';
         createdAt: number;
     };
     channels: Array<{
@@ -80,7 +80,7 @@ export type AppUpdated = {
         releaseLogEnabled: boolean;
         releaseLogLocales: Array<string>;
         releaseLogFallbackLocale: string;
-        updaterKind: 'electron' | 'tauri' | 'sparkle';
+        updaterKind: 'electron' | 'tauri' | 'sparkle' | 'sdk';
         createdAt: number;
     };
 };
@@ -95,7 +95,7 @@ export type AppUpdateRequest = {
     s3AccessKeyId: string;
     s3SecretAccessKey?: string;
     s3ForcePathStyle?: boolean;
-    updaterKind?: 'electron' | 'tauri' | 'sparkle';
+    updaterKind?: 'electron' | 'tauri' | 'sparkle' | 'sdk';
 };
 
 export type ChannelList = {

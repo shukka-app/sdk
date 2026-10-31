@@ -272,6 +272,8 @@ electron(r'electron'),
 tauri(r'tauri'),
 @JsonValue(r'sparkle')
 sparkle(r'sparkle'),
+@JsonValue(r'sdk')
+sdk(r'sdk'),
 @JsonValue(r'unknown_default_open_api')
 unknownDefaultOpenApi(r'unknown_default_open_api');
 

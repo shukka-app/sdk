@@ -221,6 +221,7 @@ const _$AppUpdateRequestUpdaterKindEnumEnumMap = {
   AppUpdateRequestUpdaterKindEnum.electron: 'electron',
   AppUpdateRequestUpdaterKindEnum.tauri: 'tauri',
   AppUpdateRequestUpdaterKindEnum.sparkle: 'sparkle',
+  AppUpdateRequestUpdaterKindEnum.sdk: 'sdk',
   AppUpdateRequestUpdaterKindEnum.unknownDefaultOpenApi:
       'unknown_default_open_api',
 };
