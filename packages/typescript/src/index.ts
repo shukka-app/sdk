@@ -17,6 +17,7 @@ import {
   getApp,
   getArtifact,
   getChannelFeed,
+  getChannelRelease,
   getChannelTrend,
   getEditorNotes,
   getFeedFile,
@@ -40,6 +41,7 @@ import type {
   GetAppData,
   GetArtifactData,
   GetChannelFeedData,
+  GetChannelReleaseData,
   GetChannelTrendData,
   GetEditorNotesData,
   GetFeedFileData,
@@ -124,6 +126,8 @@ export function createShukkaClient(options: ShukkaClientOptions) {
       finalizeUpload({ ...input, client })) satisfies Bound<FinalizeUploadData>,
     getChannelFeed: (<T extends boolean = false>(input: Omit<Options<GetChannelFeedData, T>, 'client'>) =>
       getChannelFeed({ ...input, client })) satisfies Bound<GetChannelFeedData>,
+    getChannelRelease: (<T extends boolean = false>(input: Omit<Options<GetChannelReleaseData, T>, 'client'>) =>
+      getChannelRelease({ ...input, client })) satisfies Bound<GetChannelReleaseData>,
     getFeedFile: (<T extends boolean = false>(input: Omit<Options<GetFeedFileData, T>, 'client'>) =>
       getFeedFile({ ...input, client })) satisfies Bound<GetFeedFileData>,
   }
