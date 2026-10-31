@@ -40,6 +40,20 @@ function patchDartPubspec() {
   writeFileSync(path, patched)
 }
 
+/**
+ * pub.dev wants a LICENSE and a CHANGELOG next to the pubspec, and the Dart
+ * package is rewritten from scratch on every run, so both are recreated here.
+ */
+function writeDartPublishingFiles() {
+  const pkg = join(root, 'packages', 'dart')
+  const { version } = /version:\s*(?<version>[^\s]+)/.exec(readFileSync(join(pkg, 'pubspec.yaml'), 'utf8')).groups
+  copyFileSync(join(root, 'LICENSE'), join(pkg, 'LICENSE'))
+  writeFileSync(
+    join(pkg, 'CHANGELOG.md'),
+    `## ${version}\n\nGenerated from the Shukka OpenAPI contract (${new Date().toISOString().slice(0, 10)}).\n`,
+  )
+}
+
 const generators = {
   typescript() {
     run(join(bin, 'openapi-ts'), ['-f', 'openapi-ts.config.ts'], join(root, 'packages', 'typescript'))
@@ -62,13 +76,20 @@ const generators = {
       '-c', join(root, 'scripts', 'generator', 'dart.yaml'),
     ])
     patchDartPubspec()
+    writeDartPublishingFiles()
     const pkg = join(root, 'packages', 'dart')
     run('dart', ['pub', 'get'], pkg)
     run('dart', ['run', 'build_runner', 'build', '--delete-conflicting-outputs'], pkg)
+    // openapi-generator imports `error.dart` in operations that declare a 404
+    // body but never reference the type. Pub.dev rejects a package whose
+    // analyzer output is not empty, so drop exactly those imports.
+    run('dart', ['fix', '--apply', '--code=unused_import'], pkg)
   },
 
   rust() {
-    // progenitor runs in build.rs against spec/openapi-3.0.json (3.0.x only).
+    // The crate carries its own copy of the contract so the published tarball
+    // is self-contained; build.rs runs against it.
+    copyFileSync(spec30, join(root, 'packages', 'rust', 'openapi.json'))
     run('cargo', ['build'], join(root, 'packages', 'rust'))
   },
 

@@ -9,7 +9,6 @@ import 'dart:convert';
 import 'package:shukka_sdk/src/deserialize.dart';
 import 'package:dio/dio.dart';
 
-import 'package:shukka_sdk/src/model/error.dart';
 import 'package:shukka_sdk/src/model/ok_response.dart';
 import 'package:shukka_sdk/src/model/release_metadata.dart';
 import 'package:shukka_sdk/src/model/replace_release_metadata_request.dart';

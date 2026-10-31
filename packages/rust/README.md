@@ -23,5 +23,7 @@ async fn main() -> Result<(), progenitor_client::Error<()>> {
 ```
 
 The client is generated at build time by [progenitor](https://github.com/oxidecomputer/progenitor)
-from `../../spec/openapi-3.0.json` (`build.rs`). progenitor only accepts OpenAPI 3.0.x and
-requires a unique `operationId` per operation — both are guarantees of the shukka contract.
+from `openapi.json` next to `Cargo.toml` (`build.rs`); `scripts/generate.mjs` refreshes that
+copy from `spec/openapi-3.0.json` so the published crate is self-contained. progenitor only
+accepts OpenAPI 3.0.x and requires a unique `operationId` per operation — both are guarantees
+of the shukka contract.
