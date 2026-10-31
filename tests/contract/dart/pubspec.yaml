@@ -1,0 +1,10 @@
+name: shukka_contract
+description: Contract tests for the generated Shukka Dart SDK.
+publish_to: none
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+
+dependencies:
+  shukka_sdk:
+    path: ../../../packages/dart

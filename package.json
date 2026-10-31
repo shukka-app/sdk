@@ -8,7 +8,10 @@
     "gen:typescript": "node scripts/generate.mjs typescript",
     "gen:dart": "node scripts/generate.mjs dart",
     "gen:rust": "node scripts/generate.mjs rust",
-    "gen:swift": "node scripts/generate.mjs swift"
+    "gen:swift": "node scripts/generate.mjs swift",
+    "test:contract": "node scripts/test-contract.mjs",
+    "test:publish": "node scripts/test-publish.mjs",
+    "version:set": "node scripts/set-version.mjs"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",

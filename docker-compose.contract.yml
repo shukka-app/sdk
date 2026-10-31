@@ -1,0 +1,56 @@
+# Throwaway Shukka instance for the contract tests.
+#
+#   docker compose -f docker-compose.contract.yml up -d
+#   docker compose -f docker-compose.contract.yml run --rm publisher node /contract/provision.mjs
+#   docker compose -f docker-compose.contract.yml down -v
+#
+# `scripts/test-contract.mjs` drives all of this, waits for health, and tears the
+# stack down. The `publisher` service exists because presigned URLs are signed
+# for the `minio` hostname: provisioning and publishing must run inside the
+# compose network, while the language runners run on the host against :3000.
+name: shukka-sdk-contract
+
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-shukka}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-shukkasecret}
+    ports:
+      - '9000:9000'
+    volumes:
+      - minio-data:/data
+
+  shukka:
+    image: ${SHUKKA_IMAGE:-ghcr.io/shukka-app/shukka:latest}
+    ports:
+      - '${SHUKKA_CONTRACT_PORT:-3000}:3000'
+    volumes:
+      - shukka-data:/data
+    depends_on:
+      - minio
+
+  publisher:
+    image: node:24-alpine
+    profiles: ['tools']
+    working_dir: /contract
+    entrypoint: ['node']
+    environment:
+      SHUKKA_URL: http://shukka:3000
+      S3_URL: http://minio:9000
+      S3_BUCKET: ${S3_BUCKET:-releases}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-shukka}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-shukkasecret}
+      SHUKKA_APP: ${SHUKKA_CONTRACT_APP:-shukka-contract-ci}
+      SHUKKA_CONTRACT_CHANNEL: ${SHUKKA_CONTRACT_CHANNEL:-stable}
+      SHUKKA_CONTRACT_VERSION: ${SHUKKA_CONTRACT_VERSION:-1.2.3}
+    volumes:
+      - ./scripts/contract:/contract:ro
+    depends_on:
+      - shukka
+      - minio
+
+volumes:
+  minio-data:
+  shukka-data:

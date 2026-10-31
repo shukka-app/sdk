@@ -5,6 +5,8 @@ dist/
 # Dart
 packages/dart/.dart_tool/
 packages/dart/.packages
+tests/contract/dart/.dart_tool/
+tests/contract/dart/pubspec.lock
 
 # Rust
 packages/rust/target/
