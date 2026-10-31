@@ -97,9 +97,10 @@ tarball, runs `dart pub publish --dry-run`, `cargo publish --dry-run`, and
 `swift package describe`.
 
 On a `vX.Y.Z` tag, `.github/workflows/publish.yml` publishes `@shukka/sdk` through npm
-trusted publishing — GitHub OIDC plus `--provenance`, with no token in secrets. pub.dev
-and crates.io are validated by the same workflow but still published by hand; see
-[`TODO.md`](TODO.md).
+trusted publishing — GitHub OIDC with no token in secrets. The trusted publisher is
+registered with `npm trust github @shukka/sdk --repo shukka-app/sdk --file publish.yml
+--allow-publish` after the package's first, hand-published version. pub.dev and crates.io
+support trusted publishing too; see [`TODO.md`](TODO.md).
 
 ## Release flow
 

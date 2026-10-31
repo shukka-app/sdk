@@ -80,8 +80,9 @@ jobs:
           cache: pnpm
 
       # Trusted publishing needs a recent npm; it exchanges the GitHub OIDC
-      # token for a short-lived publish credential.
-      - run: npm install --global npm@11
+      # token for a short-lived publish credential. 11.15 is the first release
+      # with `npm trust`, which is how the trusted publisher gets registered.
+      - run: npm install --global 'npm@^11.15.0'
       - run: pnpm install --frozen-lockfile
 
       - name: Resolve the version
