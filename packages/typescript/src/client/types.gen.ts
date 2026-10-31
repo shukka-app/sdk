@@ -275,6 +275,16 @@ export type TauriFeed = {
     };
 };
 
+export type ChannelRelease = {
+    version: string;
+    releasedAt: number;
+    files: Array<{
+        filename: string;
+        size: number;
+        url: string;
+    }>;
+};
+
 export type GetAppData = {
     body?: never;
     path: {
@@ -600,6 +610,34 @@ export type ListPublicNotesResponses = {
 };
 
 export type ListPublicNotesResponse = ListPublicNotesResponses[keyof ListPublicNotesResponses];
+
+export type GetChannelReleaseData = {
+    body?: never;
+    path: {
+        appSlug: string;
+        channel: string;
+    };
+    query?: never;
+    url: '/api/v1/apps/{appSlug}/channels/{channel}/release';
+};
+
+export type GetChannelReleaseErrors = {
+    /**
+     * Missing or draft
+     */
+    404: Error;
+};
+
+export type GetChannelReleaseError = GetChannelReleaseErrors[keyof GetChannelReleaseErrors];
+
+export type GetChannelReleaseResponses = {
+    /**
+     * Current released version and its files
+     */
+    200: ChannelRelease;
+};
+
+export type GetChannelReleaseResponse = GetChannelReleaseResponses[keyof GetChannelReleaseResponses];
 
 export type SaveNotesConfigData = {
     body: SaveNotesConfigRequest;

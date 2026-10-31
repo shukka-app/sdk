@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:shukka_sdk/src/deserialize.dart';
 import 'package:dio/dio.dart';
 
+import 'package:shukka_sdk/src/model/channel_release.dart';
 import 'package:shukka_sdk/src/model/tauri_feed.dart';
 
 class FeedApi {
@@ -80,6 +81,80 @@ _responseData = rawData == null ? null : deserialize<TauriFeed, TauriFeed>(rawDa
     }
 
     return Response<TauriFeed>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Get channel release
+  /// Format-neutral manifest for non-updater clients: current version, release time, and downloadable artifacts. Lists &#x60;kind: artifact&#x60; files only; each URL 302s into the feed. 404 when the channel has no released current version.
+  ///
+  /// Parameters:
+  /// * [appSlug] 
+  /// * [channel] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [ChannelRelease] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<ChannelRelease>> getChannelRelease({ 
+    required String appSlug,
+    required String channel,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/apps/{appSlug}/channels/{channel}/release'.replaceAll('{' r'appSlug' '}', appSlug.toString()).replaceAll('{' r'channel' '}', channel.toString());
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    ChannelRelease? _responseData;
+
+    try {
+final rawData = _response.data;
+_responseData = rawData == null ? null : deserialize<ChannelRelease, ChannelRelease>(rawData, 'ChannelRelease', growable: true);
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<ChannelRelease>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

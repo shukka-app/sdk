@@ -27,6 +27,8 @@ export 'package:shukka_sdk/src/model/app_updated.dart';
 export 'package:shukka_sdk/src/model/channel_created.dart';
 export 'package:shukka_sdk/src/model/channel_list.dart';
 export 'package:shukka_sdk/src/model/channel_list_channels_inner.dart';
+export 'package:shukka_sdk/src/model/channel_release.dart';
+export 'package:shukka_sdk/src/model/channel_release_files_inner.dart';
 export 'package:shukka_sdk/src/model/channel_trend.dart';
 export 'package:shukka_sdk/src/model/channel_trend_points_inner.dart';
 export 'package:shukka_sdk/src/model/create_channel_request.dart';
