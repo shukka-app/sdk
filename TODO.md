@@ -29,10 +29,9 @@ Remaining:
   next to `Cargo.toml`, because publishing only includes files inside the crate directory.
 - Swift — `swift package describe`.
 
-- [ ] Confirm the `shukka` crate name is free on crates.io (the API returned 403 from this
-      network, so this is still unverified).
-- [ ] Re-check `@shukka/sdk` and `shukka_sdk` immediately before the first publish
-      (both were free on 2026-10-30).
+- [x] Confirm the `shukka` crate name is free on crates.io — 404 on 2026-10-31.
+- [x] Re-check `@shukka/sdk` and `shukka_sdk` immediately before the first publish
+      (both 404 on 2026-10-31).
 
 ## 3. npm trusted publishing — workflow done, registration pending
 
