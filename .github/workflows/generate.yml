@@ -25,22 +25,22 @@ concurrency:
 
 jobs:
   generate:
-    name: Regenerate and open a PR
+    name: Regenerate and push the result
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
       SHUKKA_SPEC_URL: ${{ github.event.client_payload.spec_base_url || github.event.inputs.spec_base_url || 'https://raw.githubusercontent.com/shukka-app/shukka/main/apps/docs/public' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
@@ -99,7 +99,7 @@ jobs:
 
       - name: Upload generated output on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: generated
           path: |
