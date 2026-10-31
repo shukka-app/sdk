@@ -61,13 +61,55 @@ sha256 of what was pulled.
 
 Generated code is committed. A diff after regeneration is the signal that the contract moved.
 
-## Release flow (planned)
+## Contract tests
 
-1. shukka tags a release and publishes `openapi.json` + `openapi.v3.0.json` as release assets.
-2. `repository_dispatch` lands here; `fetch-spec.mjs` pulls from the release assets (immutable per tag).
-3. `generate.mjs` runs; no diff means nothing to ship.
+```bash
+node scripts/test-contract.mjs                  # all four languages
+node scripts/test-contract.mjs typescript dart  # just these
+node scripts/test-contract.mjs --keep           # leave the stack running
+```
+
+The orchestrator starts `ghcr.io/shukka-app/shukka` + MinIO with
+`docker-compose.contract.yml`, creates an app and an API key, publishes one Tauri release
+through the upload protocol, then runs one runner per language against the live instance:
+
+| Language | Runner |
+|---|---|
+| TypeScript | `tests/contract/typescript.mjs` (imports the built `dist/`) |
+| Dart | `tests/contract/dart/bin/contract.dart` |
+| Rust | `packages/rust/tests/contract.rs` (`cargo test --test contract`) |
+| Swift | `packages/swift/Tests/ShukkaSDKContractTests` (`swift test`) |
+
+Each runner reads `getApp` → `listChannels` → `listPublicNotes` → `getChannelFeed` →
+`getFeedFile`; the orchestrator separately asserts that an artifact request 302s instead
+of inlining the body. The Rust client is the strictest (`deny_unknown_fields`), so it
+catches responses that drift from the documented schema.
+
+The runtime image defaults to `:latest`. Pin `SHUKKA_IMAGE` to the image built from the
+release the contract came from; `--no-docker` reuses an instance at
+`SHUKKA_CONTRACT_URL`.
+
+## Publishing
+
+`node scripts/test-publish.mjs` is a credential-free dry run: it inspects the npm
+tarball, runs `dart pub publish --dry-run`, `cargo publish --dry-run`, and
+`swift package describe`.
+
+On a `vX.Y.Z` tag, `.github/workflows/publish.yml` publishes `@shukka/sdk` through npm
+trusted publishing — GitHub OIDC plus `--provenance`, with no token in secrets. pub.dev
+and crates.io are validated by the same workflow but still published by hand; see
+[`TODO.md`](TODO.md).
+
+## Release flow
+
+1. shukka tags a release and publishes `openapi.json` + `openapi.v3.0.json` as release
+   assets. (Not wired up yet — until then the spec is pulled from the docs site.)
+2. `repository_dispatch` (`shukka-release`) lands here; `fetch-spec.mjs` pulls from the
+   payload's `spec_base_url`.
+3. `generate.yml` runs `generate.mjs`; no diff means the release did not change the contract.
 4. A PR with the regenerated diff goes to review; merging tags `vX.Y.Z`.
-5. Publish jobs fan out: npm, pub.dev, crates.io, and the Swift tag itself.
+5. `publish.yml` publishes npm from that tag. pub.dev and crates.io follow once their OIDC
+   publishing is configured.
 
 The SDK version tracks the shukka release it was generated from. Breaking contract changes
 (renamed `operationId`, removed fields) bump the SDK major.
@@ -80,8 +122,5 @@ The SDK version tracks the shukka release it was generated from. Breaking contra
   would finish the job.
 - **Upload is not wrapped.** `initUpload → presigned PUT → finalizeUpload` needs a hand-written
   helper per language (streaming body, content-length, retries). Deprioritized on purpose.
-- **No contract tests yet.** Every SDK compiles, but nothing proves a generated client can
-  talk to a real shukka. [`TODO.md`](TODO.md) has the plan, along with publishing and npm
-  trusted publishing.
 - **Swift pins swift-collections `< 1.7.0`** in `Package.swift`: 1.7.x does not compile with
   the Swift 6.4 toolchain (Xcode 27). Remove the pin once upstream fixes it.

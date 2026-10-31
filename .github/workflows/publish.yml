@@ -1,0 +1,107 @@
+# Checks what each registry would receive, and publishes the npm package from a
+# tag using npm's trusted publishing (OIDC, no long-lived token).
+#
+# pub.dev and crates.io are validated here but still published by hand — see
+# TODO.md for moving them to OIDC as well.
+name: publish
+
+on:
+  push:
+    tags: ['v*.*.*']
+  pull_request:
+    paths:
+      - 'packages/**'
+      - 'scripts/**'
+      - '.github/workflows/publish.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Only run the registry dry runs
+        type: boolean
+        default: true
+      version:
+        description: Version to publish (required when dry_run is false)
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Registry dry runs
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: '6.1'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: npm, pub.dev, crates.io, SwiftPM
+        run: node scripts/test-publish.mjs
+
+  npm:
+    name: Publish @shukka/sdk (trusted publishing)
+    needs: verify
+    if: github.ref_type == 'tag' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == false)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Trusted publishing needs a recent npm; it exchanges the GitHub OIDC
+      # token for a short-lived publish credential.
+      - run: npm install --global npm@11
+      - run: pnpm install --frozen-lockfile
+
+      - name: Resolve the version
+        id: version
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ] && [ "${{ github.ref_type }}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if [ -z "$VERSION" ]; then
+            echo "A version is required when publishing without a tag." >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Write the version into every package
+        run: node scripts/set-version.mjs "${{ steps.version.outputs.version }}"
+
+      - run: pnpm --filter @shukka/sdk build
+
+      - name: Publish with provenance
+        working-directory: packages/typescript
+        run: npm publish --provenance --access public

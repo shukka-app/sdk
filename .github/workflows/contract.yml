@@ -1,0 +1,73 @@
+# Runs every generated SDK against a real Shukka instance.
+#
+# The stack is thrown away afterwards: docker-compose.contract.yml starts
+# Shukka + MinIO, provision.mjs creates an app and a key, publish.mjs uploads
+# one Tauri release, and each language runner reads it back through its own
+# generated client.
+name: contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      shukka_image:
+        description: Runtime image to test against
+        required: false
+        default: ghcr.io/shukka-app/shukka:latest
+  push:
+    branches: [main]
+    paths:
+      - 'spec/**'
+      - 'packages/**'
+      - 'tests/contract/**'
+      - 'scripts/**'
+      - 'docker-compose.contract.yml'
+      - '.github/workflows/contract.yml'
+  pull_request:
+    paths:
+      - 'spec/**'
+      - 'packages/**'
+      - 'tests/contract/**'
+      - 'scripts/**'
+      - 'docker-compose.contract.yml'
+      - '.github/workflows/contract.yml'
+  schedule:
+    - cron: '0 4 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: Generated clients vs a live Shukka
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SHUKKA_IMAGE: ${{ github.event.inputs.shukka_image || 'ghcr.io/shukka-app/shukka:latest' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: '6.1'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Start the stack, publish a release, run every runner
+        run: node scripts/test-contract.mjs
