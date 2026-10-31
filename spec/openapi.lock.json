@@ -2,12 +2,12 @@
   "files": {
     "openapi.json": {
       "openapi": "3.1.0",
-      "sha256": "632b0c7deed24c4b5ef54ff1e5929163b3b2caae4abb3e085b1051e52841ce48",
+      "sha256": "04d91e885259aed7bc3bd84ef9df69ff8d224d00f873fa6487d8e29b7f0d9225",
       "operations": 21
     },
     "openapi-3.0.json": {
       "openapi": "3.0.3",
-      "sha256": "97fea4ab013f256ef7a160fade774adef74e9381ddbdb5061a40c9de789692ba",
+      "sha256": "f412c37b7eba211f5222e172ee716e132044b91bf657cd14b9bf6806f74c7143",
       "operations": 21
     }
   }
