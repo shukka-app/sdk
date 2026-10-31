@@ -16,6 +16,15 @@ void main() {
       // TODO
     });
 
+    // Get channel release
+    //
+    // Format-neutral manifest for non-updater clients: current version, release time, and downloadable artifacts. Lists `kind: artifact` files only; each URL 302s into the feed. 404 when the channel has no released current version.
+    //
+    //Future<ChannelRelease> getChannelRelease(String appSlug, String channel) async
+    test('test getChannelRelease', () async {
+      // TODO
+    });
+
     // Get public feed
     //
     // Electron yml / Tauri latest.json / Sparkle appcast; artifacts 302. Drafts are 404.

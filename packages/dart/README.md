@@ -74,6 +74,7 @@ Class | Method | HTTP request | Description
 [*ChannelsApi*](doc/ChannelsApi.md) | [**listChannels**](doc/ChannelsApi.md#listchannels) | **GET** /api/v1/apps/{appSlug}/channels | List channels
 [*ChannelsApi*](doc/ChannelsApi.md) | [**setCurrentVersion**](doc/ChannelsApi.md#setcurrentversion) | **PATCH** /api/v1/apps/{appSlug}/channels/{channel} | Set current version
 [*FeedApi*](doc/FeedApi.md) | [**getChannelFeed**](doc/FeedApi.md#getchannelfeed) | **GET** /api/update/{appSlug}/{channel} | Get channel feed
+[*FeedApi*](doc/FeedApi.md) | [**getChannelRelease**](doc/FeedApi.md#getchannelrelease) | **GET** /api/v1/apps/{appSlug}/channels/{channel}/release | Get channel release
 [*FeedApi*](doc/FeedApi.md) | [**getFeedFile**](doc/FeedApi.md#getfeedfile) | **GET** /api/update/{appSlug}/{channel}/{filename} | Get public feed
 [*NotesApi*](doc/NotesApi.md) | [**deleteNote**](doc/NotesApi.md#deletenote) | **DELETE** /api/v1/apps/{appSlug}/channels/{channel}/versions/{version}/notes/{locale} | Delete a locale note
 [*NotesApi*](doc/NotesApi.md) | [**getEditorNotes**](doc/NotesApi.md#geteditornotes) | **GET** /api/v1/apps/{appSlug}/channels/{channel}/versions/{version}/notes | Get editor notes
@@ -102,6 +103,8 @@ Class | Method | HTTP request | Description
  - [ChannelCreated](doc/ChannelCreated.md)
  - [ChannelList](doc/ChannelList.md)
  - [ChannelListChannelsInner](doc/ChannelListChannelsInner.md)
+ - [ChannelRelease](doc/ChannelRelease.md)
+ - [ChannelReleaseFilesInner](doc/ChannelReleaseFilesInner.md)
  - [ChannelTrend](doc/ChannelTrend.md)
  - [ChannelTrendPointsInner](doc/ChannelTrendPointsInner.md)
  - [CreateChannelRequest](doc/CreateChannelRequest.md)

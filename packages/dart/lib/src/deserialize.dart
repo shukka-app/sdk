@@ -9,6 +9,8 @@ import 'package:shukka_sdk/src/model/app_updated.dart';
 import 'package:shukka_sdk/src/model/channel_created.dart';
 import 'package:shukka_sdk/src/model/channel_list.dart';
 import 'package:shukka_sdk/src/model/channel_list_channels_inner.dart';
+import 'package:shukka_sdk/src/model/channel_release.dart';
+import 'package:shukka_sdk/src/model/channel_release_files_inner.dart';
 import 'package:shukka_sdk/src/model/channel_trend.dart';
 import 'package:shukka_sdk/src/model/channel_trend_points_inner.dart';
 import 'package:shukka_sdk/src/model/create_channel_request.dart';
@@ -77,6 +79,10 @@ final _regMap = RegExp(r'^Map<String,(.*)>$');
           return ChannelList.fromJson(value as Map<String, dynamic>) as ReturnType;
         case 'ChannelListChannelsInner':
           return ChannelListChannelsInner.fromJson(value as Map<String, dynamic>) as ReturnType;
+        case 'ChannelRelease':
+          return ChannelRelease.fromJson(value as Map<String, dynamic>) as ReturnType;
+        case 'ChannelReleaseFilesInner':
+          return ChannelReleaseFilesInner.fromJson(value as Map<String, dynamic>) as ReturnType;
         case 'ChannelTrend':
           return ChannelTrend.fromJson(value as Map<String, dynamic>) as ReturnType;
         case 'ChannelTrendPointsInner':

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateChannelData, CreateChannelResponses, DeleteChannelData, DeleteChannelResponses, DeleteNoteData, DeleteNoteResponses, DeleteVersionData, DeleteVersionResponses, FinalizeUploadData, FinalizeUploadResponses, GetAppData, GetAppResponses, GetArtifactData, GetArtifactErrors, GetChannelFeedData, GetChannelFeedErrors, GetChannelFeedResponses, GetChannelTrendData, GetChannelTrendResponses, GetEditorNotesData, GetEditorNotesResponses, GetFeedFileData, GetFeedFileErrors, GetFeedFileResponses, GetReleaseMetadataData, GetReleaseMetadataErrors, GetReleaseMetadataResponses, GetVersionTrendData, GetVersionTrendResponses, InitUploadData, InitUploadResponses, ListChannelsData, ListChannelsResponses, ListPublicNotesData, ListPublicNotesResponses, ReplaceReleaseMetadataData, ReplaceReleaseMetadataResponses, SaveNotesConfigData, SaveNotesConfigResponses, SetCurrentVersionData, SetCurrentVersionResponses, UpdateAppData, UpdateAppResponses, UpsertNoteData, UpsertNoteResponses } from './types.gen';
+import type { CreateChannelData, CreateChannelResponses, DeleteChannelData, DeleteChannelResponses, DeleteNoteData, DeleteNoteResponses, DeleteVersionData, DeleteVersionResponses, FinalizeUploadData, FinalizeUploadResponses, GetAppData, GetAppResponses, GetArtifactData, GetArtifactErrors, GetChannelFeedData, GetChannelFeedErrors, GetChannelFeedResponses, GetChannelReleaseData, GetChannelReleaseErrors, GetChannelReleaseResponses, GetChannelTrendData, GetChannelTrendResponses, GetEditorNotesData, GetEditorNotesResponses, GetFeedFileData, GetFeedFileErrors, GetFeedFileResponses, GetReleaseMetadataData, GetReleaseMetadataErrors, GetReleaseMetadataResponses, GetVersionTrendData, GetVersionTrendResponses, InitUploadData, InitUploadResponses, ListChannelsData, ListChannelsResponses, ListPublicNotesData, ListPublicNotesResponses, ReplaceReleaseMetadataData, ReplaceReleaseMetadataResponses, SaveNotesConfigData, SaveNotesConfigResponses, SetCurrentVersionData, SetCurrentVersionResponses, UpdateAppData, UpdateAppResponses, UpsertNoteData, UpsertNoteResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -259,6 +259,13 @@ export const upsertNote = <ThrowOnError extends boolean = false>(options: Option
  * Released versions only; no auth.
  */
 export const listPublicNotes = <ThrowOnError extends boolean = false>(options: Options<ListPublicNotesData, ThrowOnError>): RequestResult<ListPublicNotesResponses, unknown, ThrowOnError> => (options.client ?? client).get<ListPublicNotesResponses, unknown, ThrowOnError>({ url: '/api/v1/apps/{appSlug}/channels/{channel}/notes', ...options });
+
+/**
+ * Get channel release
+ *
+ * Format-neutral manifest for non-updater clients: current version, release time, and downloadable artifacts. Lists `kind: artifact` files only; each URL 302s into the feed. 404 when the channel has no released current version.
+ */
+export const getChannelRelease = <ThrowOnError extends boolean = false>(options: Options<GetChannelReleaseData, ThrowOnError>): RequestResult<GetChannelReleaseResponses, GetChannelReleaseErrors, ThrowOnError> => (options.client ?? client).get<GetChannelReleaseResponses, GetChannelReleaseErrors, ThrowOnError>({ url: '/api/v1/apps/{appSlug}/channels/{channel}/release', ...options });
 
 /**
  * Save notes config
