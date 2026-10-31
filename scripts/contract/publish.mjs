@@ -3,7 +3,7 @@
  * Publishes one Tauri release through the upload protocol and seeds public
  * release notes, so every read surface has something to return.
  *
- * Runs inside the compose network: presigned PUTs are signed for `minio`.
+ * Runs inside the compose network: presigned PUTs are signed for `s3`.
  */
 import { createHash, randomBytes } from 'node:crypto'
 import { call, emit, fixture, log } from './lib.mjs'

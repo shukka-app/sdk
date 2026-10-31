@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Runs the contract tests: start a throwaway Shukka + MinIO, publish one Tauri
+ * Runs the contract tests: start a throwaway Shukka + S3, publish one Tauri
  * release, then make every generated SDK read it back.
  *
  *   node scripts/test-contract.mjs                 # all four languages
@@ -49,12 +49,12 @@ function run(command, args, cwd, env) {
   execFileSync(command, args, { cwd, env, stdio: 'inherit' })
 }
 
-async function waitFor(target, timeoutMs, label) {
+async function waitFor(target, timeoutMs, label, ready = (response) => response.ok) {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
     try {
       const response = await fetch(target, { signal: AbortSignal.timeout(5_000) })
-      if (response.ok) return
+      if (ready(response)) return
     } catch {
       // not up yet
     }
@@ -77,12 +77,14 @@ function lastJson(output) {
 let running = false
 try {
   if (options.docker) {
-    console.log('Starting Shukka + MinIO')
+    console.log('Starting Shukka + S3')
     compose(['up', '-d', '--remove-orphans', '--quiet-pull'])
     running = true
-    await waitFor('http://localhost:9000/minio/health/live', 120_000, 'MinIO')
-    // createApp probes the bucket with a PUT, so it has to exist first.
-    compose(['exec', '-T', 'minio', 'mkdir', '-p', '/data/releases'])
+    // An anonymous request is rejected with 403; any answer means Jetty is up.
+    await waitFor('http://localhost:9000/', 120_000, 'S3', (response) => response.status < 500)
+    // createApp probes the bucket with a PUT, so it has to exist first. s3proxy's
+    // filesystem backend maps buckets to directories.
+    compose(['exec', '-T', 's3', 'mkdir', '-p', `/data/${process.env.S3_BUCKET ?? 'releases'}`])
     await waitFor(`${url}/api/health`, 180_000, 'Shukka')
   }
 

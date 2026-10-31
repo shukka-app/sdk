@@ -5,9 +5,9 @@
 # from is the point of the test. Pass `shukka_image` to reuse a prebuilt image.
 #
 # The stack is thrown away afterwards: docker-compose.contract.yml starts
-# Shukka + MinIO, provision.mjs creates an app and a key, publish.mjs uploads
-# one Tauri release, and each language runner reads it back through its own
-# generated client.
+# Shukka + an S3-compatible store (s3proxy), provision.mjs creates an app and a
+# key, publish.mjs uploads one Tauri release, and each language runner reads it
+# back through its own generated client.
 name: contract
 
 on:

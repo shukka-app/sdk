@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Bootstraps a fresh Shukka instance for the contract tests: admin password,
- * a Tauri app pointing at MinIO, and an app-scoped API key.
+ * a Tauri app pointing at S3, and an app-scoped API key.
  *
  * Runs inside the compose network (`publisher` service), so the S3 endpoint it
- * registers is `http://minio:9000`, which is also the host presigned URLs are
+ * registers is `http://s3:9000`, which is also the host presigned URLs are
  * signed for.
  */
 import { baseUrl, cookieJar, emit, fixture, log, request } from './lib.mjs'
@@ -39,7 +39,7 @@ if (app) {
     name: 'Shukka Contract CI',
     slug: fixture.app,
     updaterKind: 'tauri',
-    s3Endpoint: process.env.S3_URL ?? 'http://minio:9000',
+    s3Endpoint: process.env.S3_URL ?? 'http://s3:9000',
     s3Region: 'us-east-1',
     s3Bucket: process.env.S3_BUCKET ?? 'releases',
     s3Prefix: 'contract',

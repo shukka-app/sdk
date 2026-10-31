@@ -69,9 +69,10 @@ node scripts/test-contract.mjs typescript dart  # just these
 node scripts/test-contract.mjs --keep           # leave the stack running
 ```
 
-The orchestrator starts `ghcr.io/shukka-app/shukka` + MinIO with
-`docker-compose.contract.yml`, creates an app and an API key, publishes one Tauri release
-through the upload protocol, then runs one runner per language against the live instance:
+The orchestrator starts `ghcr.io/shukka-app/shukka` plus an S3-compatible store
+(`andrewgaul/s3proxy`, which validates SigV4) with `docker-compose.contract.yml`,
+creates an app and an API key, publishes one Tauri release through the upload protocol, then
+runs one runner per language against the live instance:
 
 | Language | Runner |
 |---|---|
