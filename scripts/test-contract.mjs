@@ -80,11 +80,18 @@ try {
     console.log('Starting Shukka + S3')
     compose(['up', '-d', '--remove-orphans', '--quiet-pull'])
     running = true
-    // An anonymous request is rejected with 403; any answer means Jetty is up.
+    // An anonymous request is rejected with 403; any answer means fakes3 is up.
     await waitFor('http://localhost:9000/', 120_000, 'S3', (response) => response.status < 500)
-    // createApp probes the bucket with a PUT, so it has to exist first. s3proxy's
-    // filesystem backend maps buckets to directories.
-    compose(['exec', '-T', 's3', 'mkdir', '-p', `/data/${process.env.S3_BUCKET ?? 'releases'}`])
+    // createApp probes the bucket with a PUT, so it has to exist first. fakes3
+    // starts empty and verifies signatures, so curl signs the CreateBucket.
+    const bucket = process.env.S3_BUCKET ?? 'releases'
+    const credentials = `${process.env.S3_ACCESS_KEY ?? 'shukka'}:${process.env.S3_SECRET_KEY ?? 'shukkasecret'}`
+    run(
+      'curl',
+      ['-fsS', '-X', 'PUT', '--aws-sigv4', 'aws:amz:us-east-1:s3', '--user', credentials, `http://localhost:9000/${bucket}`],
+      root,
+      process.env,
+    )
     await waitFor(`${url}/api/health`, 180_000, 'Shukka')
   }
 
