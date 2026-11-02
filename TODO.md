@@ -7,8 +7,9 @@ Each language reads `getApp → listChannels → listPublicNotes → getChannelF
 against a live Shukka, and the orchestrator asserts an artifact request 302s instead of
 inlining the body. The Rust runner is the strict one: its deserializer denies unknown
 fields, so a response that drifts from the schema fails instead of being ignored.
-The stack uses s3proxy rather than MinIO: MinIO's published images are no longer pullable
-anonymously, and s3proxy still rejects unsigned requests. `contract.yml` is green on `main`.
+The stack uses fakes3 (in-memory, `FAKES3_AUTH=1`) rather than MinIO: MinIO's published images
+are no longer pullable anonymously, and fakes3 still rejects unsigned requests. `contract.yml` is
+green on `main`.
 
 Remaining:
 
